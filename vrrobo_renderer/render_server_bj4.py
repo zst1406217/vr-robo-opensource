@@ -63,14 +63,14 @@ def rotation_matrix_from_quaternion(quaternion):
     return R
     
 class GSRenderer:
-    def __init__(self, pipeline : PipelineParams):
+    def __init__(self, pipeline: PipelineParams):
         with torch.inference_mode():
             self.device = "cuda"
             self.pipeline = pipeline
-            self.gaussians_env = GaussianModel(3)
-            self.gaussians_red = GaussianModel(3)
-            self.gaussians_green = GaussianModel(3)
-            self.gaussians_blue = GaussianModel(3)
+            self.gaussians_env = GaussianModel(sh_degree=3)
+            self.gaussians_red = GaussianModel(sh_degree=3)
+            self.gaussians_green = GaussianModel(sh_degree=3)
+            self.gaussians_blue = GaussianModel(sh_degree=3)
 
             self.gaussians_env.load_ply(os.path.join("output/env",
                                                 "point_cloud.ply"))
