@@ -9,7 +9,7 @@ pip install --upgrade pip
 pip install torch==2.1.2+cu118 torchvision==0.16.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
 conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit 
 
-pip install open3d pytorch3d plyfile opencv-python
+pip install open3d pytorch3d plyfile opencv-python einops e3nn rpyc
 pip install submodules/diff-plane-rasterization
 pip install submodules/simple-knn
 ```
