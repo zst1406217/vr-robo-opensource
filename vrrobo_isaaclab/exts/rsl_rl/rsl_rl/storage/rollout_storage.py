@@ -22,20 +22,16 @@ class RolloutStorage:
             self.action_mean = None
             self.action_sigma = None
             self.hidden_states = None
-            self.transitions = None
-            self.images = None
 
         def clear(self):
             self.__init__()
 
-    def __init__(self, num_envs, num_transitions_per_env, obs_shape, privileged_obs_shape, actions_shape, transition_shape, image_shape, device="cpu"):
+    def __init__(self, num_envs, num_transitions_per_env, obs_shape, privileged_obs_shape, actions_shape, device="cpu"):
         self.device = device
 
         self.obs_shape = obs_shape
         self.privileged_obs_shape = privileged_obs_shape
         self.actions_shape = actions_shape
-        self.transition_shape = transition_shape
-        self.image_shape = image_shape
 
         # Core
         self.observations = torch.zeros(num_transitions_per_env, num_envs, *obs_shape, device=self.device)
@@ -48,14 +44,6 @@ class RolloutStorage:
         self.rewards = torch.zeros(num_transitions_per_env, num_envs, 1, device=self.device)
         self.actions = torch.zeros(num_transitions_per_env, num_envs, *actions_shape, device=self.device)
         self.dones = torch.zeros(num_transitions_per_env, num_envs, 1, device=self.device).byte()
-        self.train_with_transitions = False
-        self.train_with_images = False
-        if transition_shape[0]:
-            self.transitions = torch.zeros(num_transitions_per_env, num_envs, *transition_shape, device=self.device)
-            self.train_with_transitions = True
-        if self.image_shape[0]:
-            self.images = torch.zeros(num_transitions_per_env, num_envs, *image_shape, dtype=torch.uint8, device=self.device)
-            self.train_with_images = True
 
         # For PPO
         self.actions_log_prob = torch.zeros(num_transitions_per_env, num_envs, 1, device=self.device)
@@ -81,10 +69,6 @@ class RolloutStorage:
         if self.privileged_observations is not None:
             self.privileged_observations[self.step].copy_(transition.critic_observations)
         self.actions[self.step].copy_(transition.actions)
-        if self.train_with_transitions:
-            self.transitions[self.step].copy_(transition.transitions)
-        if self.train_with_images:
-            self.images[self.step].copy_(transition.images)
         self.rewards[self.step].copy_(transition.rewards.view(-1, 1))
         self.dones[self.step].copy_(transition.dones.view(-1, 1))
         self.values[self.step].copy_(transition.values)
@@ -173,14 +157,6 @@ class RolloutStorage:
                 obs_batch = observations[batch_idx]
                 critic_observations_batch = critic_observations[batch_idx]
                 actions_batch = actions[batch_idx]
-                if self.train_with_transitions:
-                    transitions_batch = transitions[batch_idx]
-                else:
-                    transitions_batch = None
-                if self.train_with_images:
-                    images_batch = self.images[batch_idx]
-                else:
-                    images_batch = None
                 target_values_batch = values[batch_idx]
                 returns_batch = returns[batch_idx]
                 old_actions_log_prob_batch = old_actions_log_prob[batch_idx]
@@ -190,13 +166,11 @@ class RolloutStorage:
                 yield obs_batch, critic_observations_batch, actions_batch, target_values_batch, advantages_batch, returns_batch, old_actions_log_prob_batch, old_mu_batch, old_sigma_batch, (
                     None,
                     None,
-                ), None, transitions_batch, images_batch
+                ), None
 
     # for RNNs only
     def reccurent_mini_batch_generator(self, num_mini_batches, num_epochs=8):
         padded_obs_trajectories, trajectory_masks = split_and_pad_trajectories(self.observations, self.dones)
-        if self.train_with_images:
-            padded_images_trajectories, _ = split_and_pad_trajectories(self.images, self.dones)
         if self.privileged_observations is not None:
             padded_critic_obs_trajectories, _ = split_and_pad_trajectories(self.privileged_observations, self.dones)
         else:
@@ -219,15 +193,6 @@ class RolloutStorage:
                 masks_batch = trajectory_masks[:, first_traj:last_traj]
                 obs_batch = padded_obs_trajectories[:, first_traj:last_traj]
                 critic_obs_batch = padded_critic_obs_trajectories[:, first_traj:last_traj]
-                if self.train_with_transitions:
-                    transitions_batch = self.transitions[:, start:stop].flatten(0,1)
-                else:
-                    transitions_batch = None
-                if self.train_with_images:
-                    images_batch = padded_images_trajectories[:, first_traj:last_traj]
-                else:
-                    images_batch = None
-
                 actions_batch = self.actions[:, start:stop]
                 old_mu_batch = self.mu[:, start:stop]
                 old_sigma_batch = self.sigma[:, start:stop]
@@ -259,6 +224,6 @@ class RolloutStorage:
                 yield obs_batch, critic_obs_batch, actions_batch, values_batch, advantages_batch, returns_batch, old_actions_log_prob_batch, old_mu_batch, old_sigma_batch, (
                     hid_a_batch,
                     hid_c_batch,
-                ), masks_batch, transitions_batch, images_batch
+                ), masks_batch
 
                 first_traj = last_traj

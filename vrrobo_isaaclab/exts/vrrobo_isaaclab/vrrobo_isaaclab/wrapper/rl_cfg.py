@@ -150,20 +150,6 @@ class RslRlOnPolicyRunnerCfg:
 
 
 @configclass
-class RslRlPpoAmpCfg:
-    """Configuration for the PPO amp networks."""
-    hidden_dims: list[int] = MISSING
-    
-    learning_rate: float = MISSING
-    
-    file_path: str = MISSING
-    
-    gradient_penalty: list[int] = MISSING
-    
-    reward_weight: float = MISSING
-
-
-@configclass
 class RslRlPpoActorCriticCNNCfg:
     """Configuration for the PPO actor-critic networks."""
 

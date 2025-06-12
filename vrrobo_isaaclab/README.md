@@ -28,7 +28,6 @@ pip install -e .
 pip install gymnasium==0.29.0
 pip install rpyc
 ```
-Then replace the files in `exts/modified_file` into the original `Isaaclab` folder.
 
 ## Training
 ```bash
