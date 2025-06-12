@@ -46,3 +46,4 @@ _build
 .DS_Store
 */__pycache__/*
 **/output/*
+**/vr-robo-dataset
