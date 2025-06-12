@@ -10,10 +10,6 @@ import torch.optim as optim
 from rsl_rl.modules import ActorCritic
 from rsl_rl.storage import RolloutStorage
 
-import torch.utils.data as data
-import numpy as np
-import random
-
 class PPO:
     actor_critic: ActorCritic
 

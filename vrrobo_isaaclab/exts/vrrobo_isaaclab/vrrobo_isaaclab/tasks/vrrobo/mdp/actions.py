@@ -2,6 +2,7 @@ from . import JointPositionAction
 from rsl_rl.modules import ActorCritic, ActorCriticRecurrent
 import torch
 from omni.isaac.lab.envs import ManagerBasedEnv
+import os
 
 class VelocityCommandAction(JointPositionAction):
     """Joint action term that applies the processed actions to the articulation's joints as position commands."""
@@ -24,6 +25,8 @@ class VelocityCommandAction(JointPositionAction):
         actor_critic: ActorCritic | ActorCriticRecurrent = actor_critic_class(
             48, 235, 12, **policy_cfg
         ).to(self._env.device)
+        policy_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), cfg.policy_dir))
+        actor_critic.load_state_dict(torch.load(policy_dir)["model_state_dict"])
         actor_critic.eval()
         self.policy = actor_critic.act_inference
         self.velocity_range=torch.tensor(cfg.velocity_range).cuda()

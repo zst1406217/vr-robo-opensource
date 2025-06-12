@@ -1,14 +1,8 @@
 from dataclasses import MISSING
 
-from omni.isaac.lab.controllers import DifferentialIKControllerCfg
-from omni.isaac.lab.managers.action_manager import ActionTerm, ActionTermCfg
+from omni.isaac.lab.managers.action_manager import ActionTerm
 from omni.isaac.lab.utils import configclass
-from omni.isaac.lab.envs.mdp import JointPositionActionCfg, JointPositionAction
-from rsl_rl.modules import ActorCritic, ActorCriticRecurrent
-from vrrobo_isaaclab.wrapper.rl_cfg import (
-    RslRlPpoActorCriticCfg,
-)
-import torch
+from omni.isaac.lab.envs.mdp import JointPositionActionCfg
 from . import actions
 
 @configclass

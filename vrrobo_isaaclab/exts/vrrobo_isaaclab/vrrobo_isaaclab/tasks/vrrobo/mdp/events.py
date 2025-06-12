@@ -17,22 +17,12 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING, Literal
 
-import carb
-import omni.physics.tensors.impl.api as physx
-
-import omni.isaac.lab.sim as sim_utils
 import omni.isaac.lab.utils.math as math_utils
-from omni.isaac.lab.actuators import ImplicitActuator
-from omni.isaac.lab.assets import Articulation, DeformableObject, RigidObject
-from omni.isaac.lab.managers import EventTermCfg, ManagerTermBase, SceneEntityCfg
-from omni.isaac.lab.terrains import TerrainImporter
+from omni.isaac.lab.assets import Articulation, RigidObject
+from omni.isaac.lab.managers import SceneEntityCfg
 
 if TYPE_CHECKING:
     from omni.isaac.lab.envs import ManagerBasedEnv
-
-sample_eval_cones=torch.load('/home/zhust/codes/go2_isaaclab/exts/scene_data/sample_eval_cones.pt').cuda()
-sample_eval_robot=torch.load('/home/zhust/codes/go2_isaaclab/exts/scene_data/sample_eval_robot.pt').cuda()
-sample_count=0
 
 def reset_asset(
     env: ManagerBasedEnv,
@@ -150,12 +140,7 @@ def reset_robot_with_cones(
     positions = default_root_states[:, 0:3] + env.scene.env_origins[env_ids] + rand_samples[:, 0:3]
     orientations_delta = math_utils.quat_from_euler_xyz(rand_samples[:, 3], rand_samples[:, 4], rand_samples[:, 5])
     orientations = math_utils.quat_mul(default_root_states[:, 3:7], orientations_delta)
-    
     velocities = default_root_states[:, 7:13]
-
-    # set into the physics simulation
-    # asset_robot.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
-    # asset_robot.write_root_velocity_to_sim(velocities, env_ids=env_ids)
 
     root_states = asset_cone_red.data.default_object_state[env_ids].clone()
     root_states[..., :3] += env.scene.env_origins[env_ids].unsqueeze(1)
@@ -270,14 +255,6 @@ def reset_root_state_uniform_custom(
     root_states = asset.data.default_root_state[env_ids].clone()
 
     # poses
-    # range_list = [pose_range.get(key, (0.0, 0.0)) for key in ["x", "y", "z", "roll", "pitch", "yaw"]]
-    # ranges = torch.tensor(range_list, device=asset.device)
-    # rand_samples = math_utils.sample_uniform(ranges[:, 0], ranges[:, 1], (len(env_ids), 6), device=asset.device)
-
-    # positions = root_states[:, 0:3] + env.scene.env_origins[env_ids] + rand_samples[:, 0:3]
-    # orientations_delta = math_utils.quat_from_euler_xyz(rand_samples[:, 3], rand_samples[:, 4], rand_samples[:, 5])
-    # orientations = math_utils.quat_mul(root_states[:, 3:7], orientations_delta)
-    
     x_range_list = pose_range.get("x")
     y_range_list = pose_range.get("y")
     yaw_range_list = pose_range.get("yaw")
@@ -323,54 +300,3 @@ def reset_root_state_uniform_custom(
     # set into the physics simulation
     asset.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
     asset.write_root_velocity_to_sim(velocities, env_ids=env_ids)
-
-def reset_robot_with_cones_default(
-    env: ManagerBasedEnv,
-    env_ids: torch.Tensor,
-    pose_range: dict[str, list], # x, y, z, yaw
-    asset_robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
-    asset_cone_red_cfg: SceneEntityCfg = SceneEntityCfg("cone_red"),
-    asset_cone_green_cfg: SceneEntityCfg = SceneEntityCfg("cone_green"),
-    asset_cone_blue_cfg: SceneEntityCfg = SceneEntityCfg("cone_blue"),
-):
-
-    global sample_eval_cones, sample_eval_robot, sample_count
-    asset_robot: RigidObject | Articulation = env.scene[asset_robot_cfg.name]
-    asset_cone_red: RigidObject | Articulation = env.scene[asset_cone_red_cfg.name]
-    asset_cone_green: RigidObject | Articulation = env.scene[asset_cone_green_cfg.name]
-    asset_cone_blue: RigidObject | Articulation = env.scene[asset_cone_blue_cfg.name]
-    # get default root state
-    default_root_states = asset_robot.data.default_root_state[env_ids].clone()
-
-    rand_samples = torch.zeros((len(env_ids), 6), device=asset_robot.device)
-    rand_samples[:, 0:2] = sample_eval_robot[sample_count, 0:2]
-    rand_samples[:, 5] = sample_eval_robot[sample_count, 2]
-
-    positions = default_root_states[:, 0:3] + env.scene.env_origins[env_ids] + rand_samples[:, 0:3]
-    orientations_delta = math_utils.quat_from_euler_xyz(rand_samples[:, 3], rand_samples[:, 4], rand_samples[:, 5])
-    orientations = math_utils.quat_mul(default_root_states[:, 3:7], orientations_delta)
-    
-    velocities = default_root_states[:, 7:13]
-
-    # set into the physics simulation
-    asset_robot.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
-    asset_robot.write_root_velocity_to_sim(velocities, env_ids=env_ids)
-
-    root_states = asset_cone_red.data.default_object_state[env_ids].clone()
-    root_states[..., :3] += env.scene.env_origins[env_ids].unsqueeze(1)
-    root_states[..., :3] += sample_eval_cones[sample_count, 0, :]
-    asset_cone_red.write_object_state_to_sim(root_states, env_ids=env_ids)
-    
-    root_states = asset_cone_green.data.default_object_state[env_ids].clone()
-    root_states[..., :3] += env.scene.env_origins[env_ids].unsqueeze(1)
-    root_states[..., :3] += sample_eval_cones[sample_count, 1, :]
-    asset_cone_green.write_object_state_to_sim(root_states, env_ids=env_ids)
-
-    root_states = asset_cone_blue.data.default_object_state[env_ids].clone()
-    root_states[..., :3] += env.scene.env_origins[env_ids].unsqueeze(1)
-    root_states[..., :3] += sample_eval_cones[sample_count, 2, :]
-    asset_cone_blue.write_object_state_to_sim(root_states, env_ids=env_ids)
-    
-    sample_count+=1
-    if sample_count>=150:
-        sample_count=149

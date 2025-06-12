@@ -25,15 +25,11 @@ import vrrobo_isaaclab.tasks.vrrobo.mdp as mdp
 ##
 from omni.isaac.lab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
 from omni.isaac.lab.assets import (
-    Articulation,
     ArticulationCfg,
     AssetBaseCfg,
-    RigidObject,
     RigidObjectCfg,
-    RigidObjectCollection,
     RigidObjectCollectionCfg,
 )
-from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR
 import vrrobo_isaaclab.terrains as terrain_gen
 from vrrobo_isaaclab.assets import UNITREE_GO2_CFG  # isort: skip
 
@@ -42,11 +38,11 @@ from vrrobo_isaaclab.assets import UNITREE_GO2_CFG  # isort: skip
 ##
 
 UPLEVEL_FREQUENCY=5
-
 BASE_HEIGHT = 0.32
+
 GOAL=[(3.2-0.53, -0.43, -0.03+0.36+BASE_HEIGHT),     # Red Cone
-    (0, 0, 0),   # Green Cone
-    (3.2-1.6, -1.59, -0.03+0.03+BASE_HEIGHT),     # Blue Cone
+    (0, 0, 0),                                       # Green Cone
+    (3.2-1.6, -1.59, -0.03+0.03+BASE_HEIGHT),        # Blue Cone
 ]
 
 ASSET_OFFSET=(3.2, 0.0, -0.01)
@@ -86,34 +82,6 @@ class MySceneCfg(InteractiveSceneCfg):
         mesh_prim_paths=["/World/ground"],
     )
     contact_forces = ContactSensorCfg(prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=3, track_air_time=True)
-    # camera = CameraCfg(
-    #     prim_path="{ENV_REGEX_NS}/Robot/base/front_cam",
-    #     offset=TiledCameraCfg.OffsetCfg(pos=[0.332+0.01, 0.0+0.015, 0.0578+0.095], rot=[0.9799, 0.0000, 0.1994, 0.0000], convention="world"),
-    #     data_types=["rgb","instance_id_segmentation_fast"],
-    #     # data_types=["instance_id_segmentation_fast"],
-    #     spawn=sim_utils.PinholeCameraCfg(
-    #         focal_length=24.0, horizontal_aperture=23.9832939727*2, vertical_aperture=13.5192958675*2, clipping_range=(0.01, 100.0)
-    #     ),
-    #     width=320,
-    #     height=180,
-    #     # colorize_semantic_segmentation = False,
-    #     # colorize_instance_segmentation = False,
-    #     # colorize_instance_id_segmentation = False,
-    # )
-    # tiled_camera: TiledCameraCfg = TiledCameraCfg(
-    #     prim_path="{ENV_REGEX_NS}/Robot/base/front_cam",
-    #     offset=TiledCameraCfg.OffsetCfg(pos=[0.332+0.01, 0.0+0.015, 0.0578+0.095], rot=[0.9799, 0.0000, 0.1994, 0.0000], convention="world"),
-    #     data_types=["rgb","instance_id_segmentation_fast"],
-    #     # data_types=["instance_id_segmentation_fast"],
-    #     spawn=sim_utils.PinholeCameraCfg(
-    #         focal_length=24.0, horizontal_aperture=23.9832939727*2, vertical_aperture=13.5192958675*2, clipping_range=(0.01, 100.0)
-    #     ),
-    #     width=320,
-    #     height=180,
-    #     # colorize_semantic_segmentation = False,
-    #     # colorize_instance_segmentation = False,
-    #     # colorize_instance_id_segmentation = False,
-    # )
     # lights
     light = AssetBaseCfg(
         prim_path="/World/light",
@@ -221,19 +189,6 @@ class MySceneCfg(InteractiveSceneCfg):
         }
     )
 
-    # object_collection: RigidObjectCollectionCfg = RigidObjectCollectionCfg(
-    #     rigid_objects={
-    #         "object_A": RigidObjectCfg(
-    #             prim_path="/World/envs/env_.*/Object_A",
-    #             spawn=sim_utils.UsdFileCfg(
-    #                 usd_path="./exts/scene_data/pgsr_obj_transformed.usd",
-    #             ),
-    #             init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 0.0, 0.05), rot=(1.0, 0.0, 0.0, 0.0)),
-    #         ),
-    #     }
-    # )
-
-
 ##
 # MDP settings
 ##
@@ -251,9 +206,8 @@ class CommandsCfg:
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    # joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True)
     joint_pos = mdp.VelocityCommandActionCfg(asset_name="robot", joint_names=[".*"], scale=0.25, use_default_offset=True, velocity_range=[0.5, 0.3, 1.0], 
-        policy_dir="/home/zhust/codes/go2_isaaclab/low_level_policy/model.pt", 
+        policy_dir="../../../../../../low_level_policy/model.pt", 
         uplevel_frequency=UPLEVEL_FREQUENCY,
     )
 
@@ -292,7 +246,6 @@ class ObservationsCfg:
         actions = ObsTerm(func=mdp.last_action)
         root_pos_e = ObsTerm(func=mdp.head_pos_w)
         root_quat_w = ObsTerm(func=mdp.root_quat_w)
-        # goal_pos = ObsTerm(func=mdp.goal_pos, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
         goal_pos = ObsTerm(func=mdp.goal_pos_multi, params={"base_height": BASE_HEIGHT})
         goal_command = ObsTerm(func=mdp.rgb_command, params={"command_name": "rgb_command"}, noise=None)
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel, noise=None)
@@ -304,23 +257,7 @@ class ObservationsCfg:
         def __post_init__(self):
             self.enable_corruption = False
             self.concatenate_terms = True
-        
-    @configclass
-    class TransitionCfg(ObsGroup):
-        """Observations for Transition group."""
 
-        # observation terms (order preserved)
-        joint_pos = ObsTerm(func=mdp.joint_pos, noise=None)
-        # base_height = ObsTerm(func=mdp.base_pos_z_e, noise=None)
-        # base_lin_vel = ObsTerm(func=mdp.base_lin_vel, noise=None)
-        # base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=None)
-        velocity_commands = ObsTerm(func=mdp.standing_velocity_commands, params={"command_name": "base_velocity"})
-
-        def __post_init__(self):
-            self.enable_corruption = False
-            self.concatenate_terms = True
-            
-            
     @configclass
     class ImageCfg(ObsGroup):
         """Observations for Transition group."""
@@ -335,7 +272,6 @@ class ObservationsCfg:
         def __post_init__(self):
             self.enable_corruption = False
             self.concatenate_terms = True
-            
             
     @configclass
     class LocomotionCfg(ObsGroup):
@@ -361,10 +297,6 @@ class ObservationsCfg:
     policy: ObsGroup = PolicyCfg()
     # critic observations groups
     critic: ObsGroup = CriticCfg()
-    # transition observations groups
-    # transition: ObsGroup = TransitionCfg()
-    # image observations groups
-    # image: ObsGroup = ImageCfg()
     # locomotion observations groups
     locomotion: ObsGroup = LocomotionCfg()
 
@@ -412,7 +344,6 @@ class EventCfg:
         mode="reset",
         params={
             "pose_range": {"x": (0.4, 0.6), "y": (-1.5, 0.5), "yaw": (-1.0, 1.0)},
-            # "pose_range": {"x": (2.4, 2.4), "y": (1.3, 1.3), "yaw": (1.57, 1.57)},
             "velocity_range": {
                 "x": (0, 0),
                 "y": (0, 0),
@@ -423,27 +354,6 @@ class EventCfg:
             },
         },
     )
-    
-    # reset_base = EventTerm(
-    #     func=mdp.reset_root_state_uniform_custom,
-    #     mode="reset",
-    #     params={
-    #         # "pose_range": {"x": [(0.4, 0.6), (0.4, 2.4), (0.4, 2.4)], "y": [(-1.5, 0.5), (0.6, 1.3), (-3.0, -2.3)], 
-    #         #             "yaw": [(-1.57, 1.57), (-3.14, 3.14), (-3.14, 3.14)], "z": [(0, 0), (0, 0), (0, 0)]},
-    #         "pose_range": {"x": [(1.7, 1.7), (0.4, 2.4), (0.4, 2.4)], "y": [(-1.4, -1.4), (0.6, 1.3), (-3.0, -2.3)], 
-    #                     "yaw": [(1.57, 1.57), (-3.14, 3.14), (-3.14, 3.14)], "z": [(0., 0.), (0, 0), (0, 0)]},
-    #         # "pose_range_prob": [0.33, 0.33, 0.34],
-    #         "pose_range_prob": [1., 0., 0.],
-    #         "velocity_range": {
-    #             "x": (0, 0),
-    #             "y": (0, 0),
-    #             "z": (0, 0),
-    #             "roll": (0, 0),
-    #             "pitch": (0, 0),
-    #             "yaw": (0, 0),
-    #         },
-    #     },
-    # )
 
     reset_robot_joints = EventTerm(
         func=mdp.reset_joints_by_scale,
@@ -458,33 +368,11 @@ class EventCfg:
         func=mdp.reset_asset,
         mode="reset",
     )
-
-    # reset_robot_with_cones = EventTerm(
-    #     func=mdp.reset_robot_with_cones,
-    #     mode="reset",
-    #     params={
-    #         # "pose_range": {"x": [(0.1, 3.0), (0.1, 0.8), (1.0, 1.8), (2.0, 3.0), (2.15, 3.0)], 
-    #         #             "y": [(0.2, 1.3), (-3.0, -0.2), (-3.0, -1.2), (-3.0, -1.9), (-1.05, -0.2)], 
-    #         #             "z": [(-0.0, -0.0), (-0.0, -0.0), (-0.0, -0.0), (-0.0, -0.0), (0.3456, 0.3456)],
-    #         #             "yaw": [(-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14)],
-    #         # },
-    #         "pose_range": {"x": [(0.1, 3.0), (1.0, 3.0), (2.15, 3.0)], 
-    #                     "y": [(0.2, 1.3),  (-3.0, -1.9), (-1.05, -0.2)], 
-    #                     "z": [(-0.0, -0.0), (-0.0, -0.0), (0.3456, 0.3456)],
-    #                     "yaw": [(-3.14, 3.14),  (-3.14, 3.14), (-3.14, 3.14)],
-    #         },
-    #     },
-    # )
     
     reset_robot_with_cones = EventTerm(
         func=mdp.reset_cones,
         mode="reset",
         params={
-            # "pose_range": {"x": [(0.1, 3.0), (0.1, 0.8), (1.0, 1.8), (2.0, 3.0), (2.15, 3.0)], 
-            #             "y": [(0.2, 1.3), (-3.0, -0.2), (-3.0, -1.2), (-3.0, -1.9), (-1.05, -0.2)], 
-            #             "z": [(-0.0, -0.0), (-0.0, -0.0), (-0.0, -0.0), (-0.0, -0.0), (0.3456, 0.3456)],
-            #             "yaw": [(-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14)],
-            # },
             "pose_range": {"x": [(0.1, 3.0), (0.1, 3.0), (2.15, 3.0)], 
                         "y": [(0.2, 1.3),  (-3.0, -1.9), (-1.05, -0.2)], 
                         "z": [(-0.0, -0.0), (-0.0, -0.0), (0.3456, 0.3456)],
@@ -493,42 +381,19 @@ class EventCfg:
         },
     )
 
-    # reset_robot_with_cones = EventTerm(
-    #     func=mdp.reset_robot_with_cones_default,
-    #     mode="reset",
-    #     params={
-    #         # "pose_range": {"x": [(0.1, 3.0), (0.1, 0.8), (1.0, 1.8), (2.0, 3.0), (2.15, 3.0)], 
-    #         #             "y": [(0.2, 1.3), (-3.0, -0.2), (-3.0, -1.2), (-3.0, -1.9), (-1.05, -0.2)], 
-    #         #             "z": [(-0.0, -0.0), (-0.0, -0.0), (-0.0, -0.0), (-0.0, -0.0), (0.3456, 0.3456)],
-    #         #             "yaw": [(-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14)],
-    #         # },
-    #         "pose_range": {"x": [(0.1, 3.0), (0.1, 3.0), (2.15, 3.0)], 
-    #                     "y": [(0.2, 1.3),  (-3.0, -1.9), (-1.05, -0.2)], 
-    #                     "z": [(-0.0, -0.0), (-0.0, -0.0), (0.3456, 0.3456)],
-    #                     "yaw": [(-3.14, 3.14),  (-3.14, 3.14), (-3.14, 3.14)],
-    #         },
-    #     },
-    # )
-
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- task
     reach_goal = RewTerm(func=mdp.reach_goal, weight=0.5, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command", "threshold": 0.35})
-    # towards_goal = RewTerm(func=mdp.towards_goal, weight=1, params={"goal_xyz": (2+0.6, -1.1, 0.32+0.4)})
-    # is_terminated = RewTerm(func=mdp.is_terminated, weight=-5.0)
     goal_dis = RewTerm(func=mdp.goal_dis, weight=5.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
     goal_dis_z = RewTerm(func=mdp.goal_dis_z, weight=30.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
     goal_heading = RewTerm(func=mdp.goal_heading_l1, weight=0.3, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
-    # stuck = RewTerm(func=mdp.stuck, weight=-0.2, params={"threshold": 0.2, "goal_xyz": GOAL})
     stand_still_at_goal = RewTerm(func=mdp.stand_still_at_goal, weight=1.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
     track_lin_vel_xy_exp_command = RewTerm(func=mdp.track_lin_vel_xy_exp_command, weight=0.2, params={"std": math.sqrt(0.25)})
     track_ang_vel_z_exp_command = RewTerm(func=mdp.track_ang_vel_z_exp_command, weight=0.2, params={"std": math.sqrt(0.25)})
     action_l2 = RewTerm(func=mdp.action_l2, weight=-0.002)
-    # penalty_wrong_goal = RewTerm(func=mdp.penalty_wrong_goal, weight=-0.5, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command", "threshold": 0.35})
-    # alive = RewTerm(func=mdp.is_alive, weight=0.1)
-
 
 @configclass
 class TerminationsCfg:
@@ -536,9 +401,6 @@ class TerminationsCfg:
 
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
     bad_orientation = DoneTerm(func=mdp.bad_orientation, params={"limit_angle": 1.0})
-    # get_goal = DoneTerm(func=mdp.get_goal, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command", "threshold": 0.25}, time_out=False)
-    # root_height = DoneTerm(func=mdp.root_height_below_minimum, params={"minimum_height":0.15})
-    # pos_limits = DoneTerm(func=mdp.joint_pos_out_of_limit)
 
 @configclass
 class CurriculumCfg:
@@ -596,7 +458,7 @@ class UnitreeGo2GSBaseEnvCfg(ManagerBasedRLEnvCfg):
 
 
 @configclass
-class UnitreeGo2GSFixEnvCfg(UnitreeGo2GSBaseEnvCfg):
+class UnitreeGo2GSEnvCfg(UnitreeGo2GSBaseEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -624,7 +486,7 @@ class UnitreeGo2GSFixEnvCfg(UnitreeGo2GSBaseEnvCfg):
         self.curriculum.terrain_levels = None
         
 @configclass
-class UnitreeGo2GSFixEnvCfg_PLAY(UnitreeGo2GSFixEnvCfg):
+class UnitreeGo2GSEnvCfg_PLAY(UnitreeGo2GSEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()

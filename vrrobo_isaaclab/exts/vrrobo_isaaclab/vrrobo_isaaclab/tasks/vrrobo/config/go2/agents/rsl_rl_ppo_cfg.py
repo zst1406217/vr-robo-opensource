@@ -12,15 +12,15 @@ from vrrobo_isaaclab.wrapper.rl_cfg import (
 )
 
 @configclass
-class UnitreeGo2GSFixPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+class UnitreeGo2GSPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     device="cuda:0"
     num_steps_per_env = 40
     max_iterations = 8000
     save_interval = 100
-    experiment_name = "unitree_go2_gsfix"
+    experiment_name = "unitree_go2_gs"
     empirical_normalization = False
-    resume = False
-    load_run = "2025-05-15_12-00-43"
+    resume = True
+    load_run = "2025-01-11_20-23-09"
     policy = RslRlPpoActorCriticCfg(
         class_name="ActorCriticRecurrent",
         init_noise_std=0.9,

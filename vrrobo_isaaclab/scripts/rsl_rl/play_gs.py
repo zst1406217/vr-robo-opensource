@@ -24,8 +24,6 @@ cli_args.add_rsl_rl_args(parser)
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 # always enable cameras to record video
-# if args_cli.video:
-#     args_cli.enable_cameras = True
 args_cli.enable_cameras = True
 
 # launch omniverse app
@@ -160,14 +158,7 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # agent stepping
-            # if "unitree_go2_gs" not in log_root_path:
-            #     obs[:, 9:12] = env.override_command
-            # torch.set_printoptions(profile="full")
-            # print(obs)
             actions = policy(obs)
-            # actions[:, 0]=1
-            # actions[:, 1]=0
-            # actions[:, 2]=0
             # env stepping
             obs, _, _, _ = env.step(actions)
         if args_cli.video:

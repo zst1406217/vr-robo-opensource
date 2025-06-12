@@ -6,7 +6,5 @@
 from .actor_critic import ActorCritic
 from .actor_critic_recurrent import ActorCriticRecurrent
 from .normalizer import EmpiricalNormalization
-from .discriminator import Discriminator
-from .actor_critic_cnn_recurrent import ActorCriticCNNRecurrent
 
-__all__ = ["ActorCritic", "ActorCriticRecurrent", "ActorCriticCNNRecurrent", "Discriminator"]
+__all__ = ["ActorCritic", "ActorCriticRecurrent"]

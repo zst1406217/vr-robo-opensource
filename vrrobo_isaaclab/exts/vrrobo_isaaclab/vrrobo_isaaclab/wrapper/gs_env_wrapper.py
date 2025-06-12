@@ -148,11 +148,7 @@ class RslRlGSEnvWrapper(VecEnv):
         else:
             obs_dict = self.unwrapped._get_observations()
 
-        if "image" in obs_dict:
-            obs=torch.concat([obs_dict["image"], obs_dict["policy"]], dim=1)
-        else:
-            obs=obs_dict["policy"]
-            
+        obs=obs_dict["policy"]
         obs_dict["critic"]=torch.cat([obs_dict["policy"][:, :28224].clone(), obs_dict["critic"]], dim=1)
             
         return obs, {"observations": obs_dict}
@@ -191,11 +187,8 @@ class RslRlGSEnvWrapper(VecEnv):
         dones = (terminated | truncated).to(dtype=torch.long)
         # move extra observations to the extras dict
         obs = obs_dict["policy"]
-        if "image" in obs_dict:
-            obs=torch.concat([obs_dict["image"], obs], dim=1)
         extras["observations"] = obs_dict
-        
-        obs_dict["critic"]=torch.cat([obs_dict["policy"][:, :28224].clone(), obs_dict["critic"]], dim=1)
+        obs_dict["critic"]=torch.cat([obs_dict["policy"].clone(), obs_dict["critic"]], dim=1)
         
         # move time out information to the extras dict
         # this is only needed for infinite horizon tasks
