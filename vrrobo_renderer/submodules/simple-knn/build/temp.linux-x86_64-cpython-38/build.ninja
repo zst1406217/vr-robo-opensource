@@ -6,8 +6,8 @@ cflags = -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wal
 post_cflags = -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1011"' -DTORCH_EXTENSION_NAME=_C -D_GLIBCXX_USE_CXX11_ABI=0 -std=c++17
 cuda_cflags = -I/usr/local/lib/python3.8/dist-packages/torch/include -I/usr/local/lib/python3.8/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.8/dist-packages/torch/include/TH -I/usr/local/lib/python3.8/dist-packages/torch/include/THC -I/m2v_intern/linzhan/miniconda3/envs/vrobo/include -I/usr/include/python3.8 -c
 cuda_post_cflags = -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr --compiler-options ''"'"'-fPIC'"'"'' -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1011"' -DTORCH_EXTENSION_NAME=_C -D_GLIBCXX_USE_CXX11_ABI=0 -gencode=arch=compute_80,code=compute_80 -gencode=arch=compute_80,code=sm_80 -std=c++17
-cuda_dlink_post_cflags = 
-ldflags = 
+cuda_dlink_post_cflags =
+ldflags =
 
 rule compile
   command = $cxx -MMD -MF $out.d $cflags -c $in -o $out $post_cflags
@@ -26,9 +26,3 @@ rule cuda_compile
 build /m2v_intern/linzhan/code/vr-robo-opensource/vrrobo_renderer/submodules/simple-knn/build/temp.linux-x86_64-cpython-38/ext.o: compile /m2v_intern/linzhan/code/vr-robo-opensource/vrrobo_renderer/submodules/simple-knn/ext.cpp
 build /m2v_intern/linzhan/code/vr-robo-opensource/vrrobo_renderer/submodules/simple-knn/build/temp.linux-x86_64-cpython-38/simple_knn.o: cuda_compile /m2v_intern/linzhan/code/vr-robo-opensource/vrrobo_renderer/submodules/simple-knn/simple_knn.cu
 build /m2v_intern/linzhan/code/vr-robo-opensource/vrrobo_renderer/submodules/simple-knn/build/temp.linux-x86_64-cpython-38/spatial.o: cuda_compile /m2v_intern/linzhan/code/vr-robo-opensource/vrrobo_renderer/submodules/simple-knn/spatial.cu
-
-
-
-
-
-

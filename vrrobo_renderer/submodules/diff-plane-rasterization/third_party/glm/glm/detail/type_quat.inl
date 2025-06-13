@@ -409,4 +409,3 @@ namespace detail
 #if GLM_CONFIG_SIMD == GLM_ENABLE
 #	include "type_quat_simd.inl"
 #endif
-

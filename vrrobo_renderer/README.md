@@ -1,13 +1,13 @@
 ## Installation
 
-The repository contains submodules, thus please check it out with 
+In the `./vrrobo_renderer` directory, run the following commands to create a conda environment and install the required packages:
 ```shell
 conda create -n vr-robo-renderer -y python=3.8
 conda activate vr-robo-renderer
 pip install --upgrade pip
 
 pip install torch==2.1.2+cu118 torchvision==0.16.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
-conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit 
+conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit
 
 pip install open3d pytorch3d plyfile opencv-python einops e3nn rpyc
 pip install submodules/diff-plane-rasterization
@@ -31,4 +31,8 @@ vrrobo_renderer
 │   │   │── ...
 ```
 
-
+## Usage
+Start render server:
+```shell
+python render_server.py
+```

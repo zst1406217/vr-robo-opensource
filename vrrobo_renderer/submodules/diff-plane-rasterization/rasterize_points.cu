@@ -3,7 +3,7 @@
  * GRAPHDECO research group, https://team.inria.fr/graphdeco
  * All rights reserved.
  *
- * This software is free for non-commercial, research and evaluation use 
+ * This software is free for non-commercial, research and evaluation use
  * under the terms of the LICENSE.md file.
  *
  * For inquiries contact  george.drettakis@inria.fr
@@ -45,7 +45,7 @@ RasterizeGaussiansCUDA(
 	const torch::Tensor& all_map,
 	const torch::Tensor& viewmatrix,
 	const torch::Tensor& projmatrix,
-	const float tan_fovx, 
+	const float tan_fovx,
 	const float tan_fovy,
     const int image_height,
     const int image_width,
@@ -59,7 +59,7 @@ RasterizeGaussiansCUDA(
   if (means3D.ndimension() != 2 || means3D.size(1) != 3) {
     AT_ERROR("means3D must have dimensions (num_points, 3)");
   }
-  
+
   const int P = means3D.size(0);
   const int H = image_height;
   const int W = image_width;
@@ -72,7 +72,7 @@ RasterizeGaussiansCUDA(
   torch::Tensor out_observe = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
   torch::Tensor out_all_map = torch::full({NUM_ALL_MAP, H, W}, 0, float_opts);
   torch::Tensor out_plane_depth = torch::full({1, H, W}, 0, float_opts);
-  
+
   torch::Device device(torch::kCUDA);
   torch::TensorOptions options(torch::kByte);
   torch::Tensor geomBuffer = torch::empty({0}, options.device(device));
@@ -81,7 +81,7 @@ RasterizeGaussiansCUDA(
   std::function<char*(size_t)> geomFunc = resizeFunctional(geomBuffer);
   std::function<char*(size_t)> binningFunc = resizeFunctional(binningBuffer);
   std::function<char*(size_t)> imgFunc = resizeFunctional(imgBuffer);
-  
+
   int rendered = 0;
   if(P != 0)
   {
@@ -100,14 +100,14 @@ RasterizeGaussiansCUDA(
 		W, H,
 		means3D.contiguous().data<float>(),
 		sh.contiguous().data_ptr<float>(),
-		colors.contiguous().data<float>(), 
-		opacity.contiguous().data<float>(), 
+		colors.contiguous().data<float>(),
+		opacity.contiguous().data<float>(),
 		scales.contiguous().data_ptr<float>(),
 		scale_modifier,
 		rotations.contiguous().data_ptr<float>(),
-		cov3D_precomp.contiguous().data<float>(), 
-		all_map.contiguous().data<float>(), 
-		viewmatrix.contiguous().data<float>(), 
+		cov3D_precomp.contiguous().data<float>(),
+		all_map.contiguous().data<float>(),
+		viewmatrix.contiguous().data<float>(),
 		projmatrix.contiguous().data<float>(),
 		campos.contiguous().data<float>(),
 		tan_fovx,
@@ -151,15 +151,15 @@ RasterizeGaussiansBackwardCUDA(
 	const torch::Tensor& binningBuffer,
 	const torch::Tensor& imageBuffer,
 	const bool render_geo,
-	const bool debug) 
+	const bool debug)
 {
   const int P = means3D.size(0);
   const int H = dL_dout_color.size(1);
   const int W = dL_dout_color.size(2);
-  
+
   int M = 0;
   if(sh.size(0) != 0)
-  {	
+  {
 	M = sh.size(1);
   }
 
@@ -174,13 +174,13 @@ RasterizeGaussiansBackwardCUDA(
   torch::Tensor dL_dsh = torch::zeros({P, M, 3}, means3D.options());
   torch::Tensor dL_dscales = torch::zeros({P, 3}, means3D.options());
   torch::Tensor dL_drotations = torch::zeros({P, 4}, means3D.options());
-  
+
   if(P != 0)
-  {  
+  {
 	  CudaRasterizer::Rasterizer::backward(P, degree, M, R,
 	  background.contiguous().data<float>(),
 	  all_map_pixels.contiguous().data<float>(),
-	  W, H, 
+	  W, H,
 	  means3D.contiguous().data<float>(),
 	  sh.contiguous().data<float>(),
 	  colors.contiguous().data<float>(),
@@ -203,7 +203,7 @@ RasterizeGaussiansBackwardCUDA(
 	  dL_dout_plane_depth.contiguous().data<float>(),
 	  dL_dmeans2D.contiguous().data<float>(),
 	  dL_dmeans2D_abs.contiguous().data<float>(),
-	  dL_dconic.contiguous().data<float>(),  
+	  dL_dconic.contiguous().data<float>(),
 	  dL_dopacity.contiguous().data<float>(),
 	  dL_dcolors.contiguous().data<float>(),
 	  dL_dmeans3D.contiguous().data<float>(),
@@ -223,11 +223,11 @@ torch::Tensor markVisible(
 		torch::Tensor& means3D,
 		torch::Tensor& viewmatrix,
 		torch::Tensor& projmatrix)
-{ 
+{
   const int P = means3D.size(0);
-  
+
   torch::Tensor present = torch::full({P}, false, means3D.options().dtype(at::kBool));
- 
+
   if(P != 0)
   {
 	CudaRasterizer::Rasterizer::markVisible(P,
@@ -236,6 +236,6 @@ torch::Tensor markVisible(
 		projmatrix.contiguous().data<float>(),
 		present.contiguous().data<bool>());
   }
-  
+
   return present;
 }

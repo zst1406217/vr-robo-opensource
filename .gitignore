@@ -37,6 +37,7 @@ _build
 
 **/mpc_data/*
 *.png
+!teaser.png
 *.mp4
 *.obj
 **/robot_data/**
