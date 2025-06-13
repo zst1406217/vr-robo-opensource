@@ -44,12 +44,23 @@ vrrobo_isaaclab
 │   │   │       ├── params
 │   │   │       ├── model_7400.pt
 ```
+And you need to modify `vrrobo_isaaclab/exts/vrrobo_isaaclab/vrrobo_isaaclab/tasks/vrrobo/config/go2/agents/rsl_rl_ppo_cfg.py` line 18 and line 19:
+```python
+resume = True
+load_run = "2025-01-11_20-23-09"
+```
 Then you can run the following command to play the demo:
 ```shell
 python scripts/rsl_rl/play_gs.py --task go2_gs_play
 ```
 
 ## Training
+To train from scratch, you need to modify `vrrobo_isaaclab/exts/vrrobo_isaaclab/vrrobo_isaaclab/tasks/vrrobo/config/go2/agents/rsl_rl_ppo_cfg.py` line 18 and line 19:
+```python
+resume = False
+load_run = ""
+```
+Then you can run the following command to train the policy:
 ```shell
 python scripts/rsl_rl/train_gs.py --task go2_gs --headless
 ```
