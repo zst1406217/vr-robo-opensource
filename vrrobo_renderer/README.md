@@ -19,7 +19,7 @@ Download our captured demo data from [Google Drive](https://drive.google.com/fil
 pip install gdown
 gdown 1qvmFvhSha5FnKgFldW8WFAEO50HhQ7GZ && unzip vr-robo-dataset.zip
 ```
-Then copy the pcd folder into `./vrrobo_renderer`. The data folder should like this:
+The data folder should like this:
 ```shell
 vrrobo_renderer
 ├── vr-robo-dataset
@@ -29,6 +29,10 @@ vrrobo_renderer
 │   │   ├── obj2
 │   │   │   └── point_cloud.ply
 │   │   │── ...
+│   └── transform.json
+```
+
+Finally, you can run the render server:
 ```
 
 ## Usage

@@ -26,6 +26,7 @@ from gaussian_renderer import GaussianModel, render
 from pytorch3d.transforms import matrix_to_quaternion
 from scene.cameras import MiniCam
 from utils.graphics_utils import getProjectionMatrix
+import json
 
 
 def send_tensor(tensor, host="localhost", port=12345):
@@ -72,7 +73,7 @@ class GSRenderer:
     (environment + three coloured groups) and renders RGB images from arbitrary
     camera poses in simulation environment."""
 
-    def __init__(self, pipeline: PipelineParams, data_dir: str = "vr-robo-dataset/pcd"):
+    def __init__(self, pipeline: PipelineParams, data_dir: str = "vr-robo-dataset"):
         with torch.inference_mode():
             self.device = "cuda"
             self.pipeline = pipeline
@@ -82,81 +83,31 @@ class GSRenderer:
             self.gaussians_green = GaussianModel(sh_degree=3)
             self.gaussians_blue = GaussianModel(sh_degree=3)
 
-            self.gaussians_env.load_ply(f"{data_dir}/scene/point_cloud.ply")
-            self.gaussians_red.load_ply(f"{data_dir}/red/point_cloud.ply")
-            self.gaussians_green.load_ply(f"{data_dir}/green/point_cloud.ply")
-            self.gaussians_blue.load_ply(f"{data_dir}/blue/point_cloud.ply")
+            self.gaussians_env.load_ply(f"{data_dir}/pcd/scene/point_cloud.ply")
+            self.gaussians_red.load_ply(f"{data_dir}/pcd/red/point_cloud.ply")
+            self.gaussians_green.load_ply(f"{data_dir}/pcd/green/point_cloud.ply")
+            self.gaussians_blue.load_ply(f"{data_dir}/pcd/blue/point_cloud.ply")
+            
+            with open(f"{data_dir}/transform.json") as f:
+                params = json.load(f)
 
-            # --- env ---------------------------------------------------------
-            T_env = np.array(
-                [
-                    [0.469, -0.032, 0.082, -1.595],
-                    [-0.079, -0.352, 0.313, -1.047],
-                    [0.039, -0.322, -0.351, 1.341],
-                    [0.000, 0.000, 0.000, 1.000],
-                ]
-            )
-            scale_env = 0.477609
+            T_env = np.array(params["env"]["T"])
+            scale_env = params["env"]["scale"]
 
-            # --- red ---------------------------------------------------------
-            bounding_box_red = np.array(
-                [
-                    [0.993446648121, -0.030691670254, 0.110096260905, 0.776266396046],
-                    [-0.002712320071, 0.956668972969, 0.291165977716, 1.652374744415],
-                    [-0.114261977375, -0.289556652308, 0.950316369534, 1.803330898285],
-                    [0.000000000000, 0.000000000000, 0.000000000000, 1.000000000000],
-                ]
-            )
-            width_red = np.array([0.87486160, 0.86398125, 1.08366120])
-            T_red = np.array(
-                [
-                    [-0.008, 0.247, -0.077, -0.261],
-                    [0.257, 0.001, -0.024, -0.159],
-                    [-0.023, -0.077, -0.246, 0.721],
-                    [0.000, 0.000, 0.000, 1.000],
-                ]
-            )
-            scale_red = 0.258537
+            bounding_box_red = np.array(params["red"]["bounding_box"])
+            width_red = np.array(params["red"]["width"])
+            T_red = np.array(params["red"]["T"])
+            scale_red = params["red"]["scale"]
 
-            # --- green -------------------------------------------------------
-            bounding_box_green = np.array(
-                [
-                    [0.927658736706, -0.328061193228, 0.178395494819, 0.267540454865],
-                    [0.351592063904, 0.928269267082, -0.121237739921, -0.996843576431],
-                    [-0.125825762749, 0.175189733505, 0.976460814476, 3.083600521088],
-                    [0.000000000000, 0.000000000000, 0.000000000000, 1.000000000000],
-                ]
-            )
-            width_green = np.array([1.10369134, 1.12264895, 1.52788544])
-            T_green = np.array(
-                [
-                    [0.055, -0.175, -0.033, -0.085],
-                    [-0.175, -0.060, 0.025, -0.091],
-                    [-0.034, 0.023, -0.182, 0.735],
-                    [0.000, 0.000, 0.000, 1.000],
-                ]
-            )
-            scale_green = 0.186556
+            bounding_box_green = np.array(params["green"]["bounding_box"])
+            width_green = np.array(params["green"]["width"])
+            T_green = np.array(params["green"]["T"])
+            scale_green = params["green"]["scale"]
 
-            # --- blue --------------------------------------------------------
-            bounding_box_blue = np.array(
-                [
-                    [0.669211506844, -0.716110467911, 0.198347613215, -0.207296669483],
-                    [0.724392294884, 0.688192307949, 0.040584608912, 1.151019573212],
-                    [-0.165564328432, 0.116521820426, 0.979291141033, 3.180432558060],
-                    [0.000000000000, 0.000000000000, 0.000000000000, 1.000000000000],
-                ]
-            )
-            width_blue = np.array([0.89889467, 0.90830016, 1.14793587])
-            T_blue = np.array(
-                [
-                    [-0.166, -0.177, 0.042, 0.035],
-                    [-0.175, 0.171, 0.030, -0.326],
-                    [-0.051, -0.010, -0.241, 0.908],
-                    [0.000, 0.000, 0.000, 1.000],
-                ]
-            )
-            scale_blue = 0.246493
+            bounding_box_blue = np.array(params["blue"]["bounding_box"])
+            width_blue = np.array(params["blue"]["width"])
+            T_blue = np.array(params["blue"]["T"])
+            scale_blue = params["blue"]["scale"]
 
             # ----- Filter + transform each coloured cloud --------------
             self.gaussians_red = filter_gaussians_within_bounding_box(self.gaussians_red, bounding_box_red, width_red)
@@ -447,7 +398,7 @@ if __name__ == "__main__":
     # Set up command line argument parser
     parser = ArgumentParser(description="Testing script parameters")
     parser.add_argument(
-        "--data_dir", type=str, default="vr-robo-dataset/pcd", help="Base directory for the point cloud data"
+        "--data_dir", type=str, default="vr-robo-dataset", help="Base directory for the point cloud data"
     )
     model = ModelParams(parser, sentinel=True)
     pipeline = PipelineParams(parser)
