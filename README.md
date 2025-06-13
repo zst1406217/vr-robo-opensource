@@ -38,6 +38,8 @@ python scripts/rsl_rl/train_gs.py --task go2_gs --headless
 
 ## 🧷 News
 
+- **[2025-06-13]** We release the training and playing code in simulation.
+
 - **[2025-05-11]** Our paper is accepted by RA-L 2025. We will release code in this repo.
 
 - **[2025-02-01]** Paper released on arXiv.
