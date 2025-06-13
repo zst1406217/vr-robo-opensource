@@ -5,6 +5,6 @@
 
 """Wrappers and utilities to configure an :class:`ManagerBasedRLEnv` for RSL-RL library."""
 
+from .gs_env_wrapper import RslRlGSEnvWrapper
 from .rl_cfg import RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg, RslRlPpoAlgorithmCfg
 from .vecenv_wrapper import RslRlVecEnvWrapper
-from .gs_env_wrapper import RslRlGSEnvWrapper

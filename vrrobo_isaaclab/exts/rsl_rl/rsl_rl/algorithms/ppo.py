@@ -10,6 +10,7 @@ import torch.optim as optim
 from rsl_rl.modules import ActorCritic
 from rsl_rl.storage import RolloutStorage
 
+
 class PPO:
     actor_critic: ActorCritic
 
@@ -29,7 +30,7 @@ class PPO:
         schedule="fixed",
         desired_kl=0.01,
         device="cpu",
-        clip_min_std= 1e-15,
+        clip_min_std=1e-15,
     ):
         self.device = device
 
@@ -54,7 +55,9 @@ class PPO:
         self.lam = lam
         self.max_grad_norm = max_grad_norm
         self.use_clipped_value_loss = use_clipped_value_loss
-        self.clip_min_std = torch.tensor(clip_min_std, device= self.device) if isinstance(clip_min_std, (tuple, list)) else clip_min_std
+        self.clip_min_std = (
+            torch.tensor(clip_min_std, device=self.device) if isinstance(clip_min_std, (tuple, list)) else clip_min_std
+        )
 
     def init_storage(self, num_envs, num_transitions_per_env, actor_obs_shape, critic_obs_shape, action_shape):
         self.storage = RolloutStorage(
@@ -80,7 +83,7 @@ class PPO:
         self.transition.observations = obs
         self.transition.critic_observations = critic_obs
         return self.transition.actions
-    
+
     def update_transitions(self, transitions):
         self.transition.transitions = transitions
 
@@ -122,8 +125,7 @@ class PPO:
             hid_states_batch,
             masks_batch,
         ) in generator:
-                
-            self.actor_critic.act(obs_batch, masks=masks_batch, hidden_states=hid_states_batch[0])            
+            self.actor_critic.act(obs_batch, masks=masks_batch, hidden_states=hid_states_batch[0])
             actions_log_prob_batch = self.actor_critic.get_actions_log_prob(actions_batch)
             value_batch = self.actor_critic.evaluate(
                 critic_obs_batch, masks=masks_batch, hidden_states=hid_states_batch[1]
@@ -186,8 +188,8 @@ class PPO:
         mean_value_loss /= num_updates
         mean_surrogate_loss /= num_updates
         self.storage.clear()
-        
+
         if hasattr(self.actor_critic, "clip_std"):
-            self.actor_critic.clip_std(min= self.clip_min_std)
+            self.actor_critic.clip_std(min=self.clip_min_std)
 
         return mean_value_loss, mean_surrogate_loss

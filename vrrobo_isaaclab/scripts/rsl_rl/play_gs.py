@@ -32,28 +32,26 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-import gymnasium as gym
 import os
 import torch
 
-from rsl_rl.runners import OnPolicyRunner
-
-from omni.isaac.lab.envs import DirectMARLEnv, multi_agent_to_single_agent
-from omni.isaac.lab.utils.dict import print_dict
-from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
-    export_policy_as_jit,
-    export_policy_as_onnx,
-)
-from vrrobo_isaaclab.wrapper import RslRlOnPolicyRunnerCfg, RslRlGSEnvWrapper
+import carb.input
+import gymnasium as gym
+import omni.appwindow
 
 # Import extensions to set up environment tasks
 import vrrobo_isaaclab.tasks  # noqa: F401
-import omni.appwindow
-import carb.input
 from carb.input import KeyboardEventType
+from omni.isaac.lab.envs import DirectMARLEnv, multi_agent_to_single_agent
+from omni.isaac.lab.utils.dict import print_dict
+from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
+from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import export_policy_as_jit, export_policy_as_onnx
+from vrrobo_isaaclab.wrapper import RslRlGSEnvWrapper, RslRlOnPolicyRunnerCfg
+
+from rsl_rl.runners import OnPolicyRunner
 
 MOVE_CAMERA = False
+
 
 def main():
     """Play with RSL-RL agent."""
@@ -110,6 +108,7 @@ def main():
     )
     # camera_direction = [2, 2, -4]
     camera_direction = [5, 0, -6]
+
     def on_keyboard_input(e):
         if e.input == carb.input.KeyboardInput.W:
             if e.type == KeyboardEventType.KEY_PRESS or e.type == KeyboardEventType.KEY_REPEAT:
@@ -134,13 +133,13 @@ def main():
                 env.override_command[:] = 0
         if e.input == carb.input.KeyboardInput.N:
             if e.type == KeyboardEventType.KEY_PRESS or e.type == KeyboardEventType.KEY_REPEAT:
-                env.env.scene.terrain.terrain_types[:]-=1
-                env.env.scene.terrain.terrain_types[:]=torch.clip(env.env.scene.terrain.terrain_types[:], 0, 19)
+                env.env.scene.terrain.terrain_types[:] -= 1
+                env.env.scene.terrain.terrain_types[:] = torch.clip(env.env.scene.terrain.terrain_types[:], 0, 19)
         if e.input == carb.input.KeyboardInput.M:
             if e.type == KeyboardEventType.KEY_PRESS or e.type == KeyboardEventType.KEY_REPEAT:
-                env.env.scene.terrain.terrain_types[:]+=1
-                env.env.scene.terrain.terrain_types[:]=torch.clip(env.env.scene.terrain.terrain_types[:], 0, 19)
-                
+                env.env.scene.terrain.terrain_types[:] += 1
+                env.env.scene.terrain.terrain_types[:] = torch.clip(env.env.scene.terrain.terrain_types[:], 0, 19)
+
     app_window = omni.appwindow.get_default_app_window()
     keyboard = app_window.get_keyboard()
     input = carb.input.acquire_input_interface()
@@ -151,8 +150,8 @@ def main():
     timestep = 0
     camera_follow_id = 0
 
-    camera_position =  env.env.scene.env_origins[camera_follow_id].cpu().numpy() - camera_direction +[1.8, -0.8, 0]
-    env.sim.set_camera_view(camera_position, camera_position+camera_direction)
+    camera_position = env.env.scene.env_origins[camera_follow_id].cpu().numpy() - camera_direction + [1.8, -0.8, 0]
+    env.sim.set_camera_view(camera_position, camera_position + camera_direction)
     # simulate environment
     while simulation_app.is_running():
         # run everything in inference mode
@@ -168,7 +167,7 @@ def main():
                 break
         if MOVE_CAMERA:
             camera_position = env.root_states[camera_follow_id, :3].cpu().numpy() - camera_direction
-            env.sim.set_camera_view(camera_position, camera_position+camera_direction)
+            env.sim.set_camera_view(camera_position, camera_position + camera_direction)
     # close the simulator
     env.close()
 

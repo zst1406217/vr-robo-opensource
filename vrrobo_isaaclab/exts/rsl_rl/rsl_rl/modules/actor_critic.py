@@ -114,10 +114,10 @@ class ActorCritic(nn.Module):
     def evaluate(self, critic_observations, **kwargs):
         value = self.critic(critic_observations)
         return value
-    
+
     @torch.no_grad()
-    def clip_std(self, min= None, max= None):
-        self.std.copy_(self.std.clip(min= min, max= max))
+    def clip_std(self, min=None, max=None):
+        self.std.copy_(self.std.clip(min=min, max=max))
 
 
 def get_activation(act_name):

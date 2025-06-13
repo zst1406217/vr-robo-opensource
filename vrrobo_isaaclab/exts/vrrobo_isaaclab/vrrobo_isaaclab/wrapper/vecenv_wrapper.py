@@ -16,13 +16,13 @@ The following example shows how to wrap an environment for RSL-RL:
 """
 
 
-import gymnasium as gym
 import torch
 
-from rsl_rl.env import VecEnv
-
+import gymnasium as gym
 from omni.isaac.lab.envs import DirectRLEnv, ManagerBasedRLEnv
 from omni.isaac.lab.managers import SceneEntityCfg
+
+from rsl_rl.env import VecEnv
 
 
 class RslRlVecEnvWrapper(VecEnv):
@@ -90,7 +90,7 @@ class RslRlVecEnvWrapper(VecEnv):
             self.num_privileged_obs = 0
         if "transition" in self.unwrapped.observation_manager.group_obs_dim:
             self.num_transition_obs = gym.spaces.flatdim(self.unwrapped.single_observation_space["transition"])
-            self.last_transition=torch.zeros(self.num_envs, self.num_transition_obs, device=self.device)
+            self.last_transition = torch.zeros(self.num_envs, self.num_transition_obs, device=self.device)
         # reset at the start since the RSL-RL runner does not call reset
         self.env.reset()
 
@@ -152,10 +152,10 @@ class RslRlVecEnvWrapper(VecEnv):
 
         # if "image" in obs_dict:
         #     obs=torch.concat([obs_dict["image"], obs_dict["policy"]], dim=1)
-            # obs_dict["critic"]=torch.concat([obs_dict["image"], obs_dict["critic"]], dim=1)
+        # obs_dict["critic"]=torch.concat([obs_dict["image"], obs_dict["critic"]], dim=1)
         # else:
-        obs=obs_dict["policy"]
-            
+        obs = obs_dict["policy"]
+
         return obs, {"observations": obs_dict}
 
     @property
@@ -182,7 +182,7 @@ class RslRlVecEnvWrapper(VecEnv):
     def reset(self) -> tuple[torch.Tensor, dict]:  # noqa: D102
         # reset the environment
         obs_dict, _ = self.env.reset()
-        self.last_transition=torch.zeros(self.num_envs, self.num_transition_obs, device=self.device)
+        self.last_transition = torch.zeros(self.num_envs, self.num_transition_obs, device=self.device)
         # return observations
         return obs_dict["policy"], {"observations": obs_dict}
 
@@ -195,14 +195,14 @@ class RslRlVecEnvWrapper(VecEnv):
         obs = obs_dict["policy"]
         # if "image" in obs_dict:
         #     obs=torch.concat([obs_dict["image"], obs], dim=1)
-            # obs_dict["critic"]=torch.concat([obs_dict["image"], obs_dict["critic"]], dim=1)
+        # obs_dict["critic"]=torch.concat([obs_dict["image"], obs_dict["critic"]], dim=1)
         extras["observations"] = obs_dict
-        
-        if (self.last_transition==0).all():
-            self.last_transition=obs_dict["transition"]
-        self.transitions=torch.cat([self.last_transition, obs_dict["transition"]],dim=1).clone()
-        self.last_transition=obs_dict["transition"]
-        
+
+        if (self.last_transition == 0).all():
+            self.last_transition = obs_dict["transition"]
+        self.transitions = torch.cat([self.last_transition, obs_dict["transition"]], dim=1).clone()
+        self.last_transition = obs_dict["transition"]
+
         # move time out information to the extras dict
         # this is only needed for infinite horizon tasks
         if not self.unwrapped.cfg.is_finite_horizon:
@@ -213,7 +213,7 @@ class RslRlVecEnvWrapper(VecEnv):
 
     def close(self):  # noqa: D102
         return self.env.close()
-    
+
     @property
     def root_states(self):
         asset_cfg = SceneEntityCfg("robot")

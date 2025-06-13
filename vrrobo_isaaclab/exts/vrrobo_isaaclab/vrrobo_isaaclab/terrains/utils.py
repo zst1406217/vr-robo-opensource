@@ -8,9 +8,10 @@ from __future__ import annotations
 import copy
 import functools
 import numpy as np
-import trimesh
 from collections.abc import Callable
 from typing import TYPE_CHECKING
+
+import trimesh
 
 if TYPE_CHECKING:
     from .hf_terrains_cfg import HfTerrainBaseCfg
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
 # asset_mesh = trimesh.load_mesh('./exts/scene_data/pgsr_obj_transformed.obj')
 # transform = np.eye(4)
 # asset_mesh.apply_transform(transform)
+
 
 def height_field_to_mesh(func: Callable) -> Callable:
     """Decorator to convert a height field function to a mesh function.
@@ -47,7 +49,7 @@ def height_field_to_mesh(func: Callable) -> Callable:
         width_pixels = round(cfg.size[0] / cfg.horizontal_scale)
         length_pixels = round(cfg.size[1] / cfg.horizontal_scale)
         border_pixels = round(cfg.border_width / cfg.horizontal_scale)
-        heights = np.zeros((width_pixels+2, length_pixels+2), dtype=np.int16)
+        heights = np.zeros((width_pixels + 2, length_pixels + 2), dtype=np.int16)
         # override size of the terrain to account for the border
         sub_terrain_size = [width_pixels - 2 * border_pixels, length_pixels - 2 * border_pixels]
         sub_terrain_size = [dim * cfg.horizontal_scale for dim in sub_terrain_size]
@@ -57,7 +59,7 @@ def height_field_to_mesh(func: Callable) -> Callable:
         # generate the height field
         z_gen = func(difficulty, cfg)
         # handle the border for the terrain
-        
+
         ### Very important!!! Without this, there is gap between different terrains.
         heights[1:-1, 1:-1] = z_gen
         # set terrain size back to config
@@ -76,7 +78,7 @@ def height_field_to_mesh(func: Callable) -> Callable:
         origin_z = np.max(heights[x1:x2, y1:y2]) * cfg.vertical_scale
         origin = np.array([0.5 * cfg.size[0], 0.5 * cfg.size[1], origin_z])
         # return mesh and origin
-        
+
         # load mesh from file if specified in the config
         # if cfg.mesh_file:
         #     mesh = trimesh.load(cfg.mesh_file)
@@ -84,7 +86,7 @@ def height_field_to_mesh(func: Callable) -> Callable:
         # transform = np.eye(4)
         # asset_mesh.apply_transform(transform)
         # mesh = trimesh.util.concatenate([mesh, asset_mesh])
-        
+
         return [mesh], origin
 
     return wrapper

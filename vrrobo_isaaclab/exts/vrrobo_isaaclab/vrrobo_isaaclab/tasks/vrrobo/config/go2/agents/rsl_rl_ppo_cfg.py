@@ -4,22 +4,18 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 from omni.isaac.lab.utils import configclass
+from vrrobo_isaaclab.wrapper.rl_cfg import RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg, RslRlPpoAlgorithmCfg
 
-from vrrobo_isaaclab.wrapper.rl_cfg import (
-    RslRlOnPolicyRunnerCfg,
-    RslRlPpoActorCriticCfg,
-    RslRlPpoAlgorithmCfg,
-)
 
 @configclass
 class UnitreeGo2GSPPORunnerCfg(RslRlOnPolicyRunnerCfg):
-    device="cuda:0"
+    device = "cuda:0"
     num_steps_per_env = 40
     max_iterations = 8000
     save_interval = 100
     experiment_name = "unitree_go2_gs"
     empirical_normalization = False
-    resume = True
+    resume = False
     load_run = "2025-01-11_20-23-09"
     policy = RslRlPpoActorCriticCfg(
         class_name="ActorCriticRecurrent",

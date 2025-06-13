@@ -4,6 +4,9 @@ import math
 from dataclasses import MISSING
 
 import omni.isaac.lab.sim as sim_utils
+import vrrobo_isaaclab.tasks.vrrobo.mdp as mdp
+import vrrobo_isaaclab.terrains as terrain_gen
+from omni.isaac.lab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg, RigidObjectCollectionCfg
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.managers import CurriculumTermCfg as CurrTerm
 from omni.isaac.lab.managers import EventTermCfg as EventTerm
@@ -18,34 +21,27 @@ from omni.isaac.lab.terrains import TerrainImporterCfg
 from omni.isaac.lab.utils import configclass
 from omni.isaac.lab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
-import vrrobo_isaaclab.tasks.vrrobo.mdp as mdp
-
 ##
 # Pre-defined configs
 ##
 from omni.isaac.lab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
-from omni.isaac.lab.assets import (
-    ArticulationCfg,
-    AssetBaseCfg,
-    RigidObjectCfg,
-    RigidObjectCollectionCfg,
-)
-import vrrobo_isaaclab.terrains as terrain_gen
 from vrrobo_isaaclab.assets import UNITREE_GO2_CFG  # isort: skip
 
 ##
 # Scene definition
 ##
 
-UPLEVEL_FREQUENCY=5
+UPLEVEL_FREQUENCY = 5
 BASE_HEIGHT = 0.32
 
-GOAL=[(3.2-0.53, -0.43, -0.03+0.36+BASE_HEIGHT),     # Red Cone
-    (0, 0, 0),                                       # Green Cone
-    (3.2-1.6, -1.59, -0.03+0.03+BASE_HEIGHT),        # Blue Cone
+GOAL = [
+    (3.2 - 0.53, -0.43, -0.03 + 0.36 + BASE_HEIGHT),  # Red Cone
+    (0, 0, 0),  # Green Cone
+    (3.2 - 1.6, -1.59, -0.03 + 0.03 + BASE_HEIGHT),  # Blue Cone
 ]
 
-ASSET_OFFSET=(3.2, 0.0, -0.01)
+ASSET_OFFSET = (3.2, 0.0, -0.01)
+
 
 @configclass
 class MySceneCfg(InteractiveSceneCfg):
@@ -112,7 +108,7 @@ class MySceneCfg(InteractiveSceneCfg):
                     mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
                     collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0-0.5, 0.0+1.9, 0.5), rot=(1.0, 0.0, 0.0, 0.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0 - 0.5, 0.0 + 1.9, 0.5), rot=(1.0, 0.0, 0.0, 0.0)),
             ),
             "wall_right": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Wall_2",
@@ -122,7 +118,7 @@ class MySceneCfg(InteractiveSceneCfg):
                     mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
                     collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0-0.5, 0.0-3.5, 0.5), rot=(1.0, 0.0, 0.0, 0.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0 - 0.5, 0.0 - 3.5, 0.5), rot=(1.0, 0.0, 0.0, 0.0)),
             ),
             "wall_front": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Wall_3",
@@ -132,7 +128,7 @@ class MySceneCfg(InteractiveSceneCfg):
                     mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
                     collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0+1.2, 0.0-0.8, 0.5), rot=(1.0, 0.0, 0.0, 0.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0 + 1.2, 0.0 - 0.8, 0.5), rot=(1.0, 0.0, 0.0, 0.0)),
             ),
             "wall_behind": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Wall_4",
@@ -142,7 +138,7 @@ class MySceneCfg(InteractiveSceneCfg):
                     mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
                     collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0-2.2, 0.0-0.8, 0.5), rot=(1.0, 0.0, 0.0, 0.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0 - 2.2, 0.0 - 0.8, 0.5), rot=(1.0, 0.0, 0.0, 0.0)),
             ),
         }
     )
@@ -156,7 +152,7 @@ class MySceneCfg(InteractiveSceneCfg):
                     mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
                     collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(0., 0., 0.01), rot=(1.0, 0.0, 0.0, 0.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 0.0, 0.01), rot=(1.0, 0.0, 0.0, 0.0)),
             ),
         }
     )
@@ -170,7 +166,7 @@ class MySceneCfg(InteractiveSceneCfg):
                     mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
                     collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(0., 0., 0.), rot=(1.0, 0.0, 0.0, 0.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 0.0, 0.0), rot=(1.0, 0.0, 0.0, 0.0)),
             ),
         }
     )
@@ -184,10 +180,11 @@ class MySceneCfg(InteractiveSceneCfg):
                     mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
                     collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(0., 0., 0.), rot=(1.0, 0.0, 0.0, 0.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 0.0, 0.0), rot=(1.0, 0.0, 0.0, 0.0)),
             ),
         }
     )
+
 
 ##
 # MDP settings
@@ -206,10 +203,16 @@ class CommandsCfg:
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_pos = mdp.VelocityCommandActionCfg(asset_name="robot", joint_names=[".*"], scale=0.25, use_default_offset=True, velocity_range=[0.5, 0.3, 1.0], 
-        policy_dir="../../../../../../low_level_policy/model.pt", 
+    joint_pos = mdp.VelocityCommandActionCfg(
+        asset_name="robot",
+        joint_names=[".*"],
+        scale=0.25,
+        use_default_offset=True,
+        velocity_range=[0.5, 0.3, 1.0],
+        policy_dir="../../../../../../low_level_policy/model.pt",
         uplevel_frequency=UPLEVEL_FREQUENCY,
     )
+
 
 @configclass
 class ObservationsCfg:
@@ -222,7 +225,12 @@ class ObservationsCfg:
         # observation terms (order preserved)
         gs_image = ObsTerm(
             func=mdp.gs_image_feature,
-            params={"camera_pos": [0.332+0.01, 0.0+0.015, 0.0578+0.095], "camera_rot":[0., 23., 0.], "asset_offset_pos": ASSET_OFFSET, "asset_offset_rot":[1.0, 0.0, 0.0, 0.0]},
+            params={
+                "camera_pos": [0.332 + 0.01, 0.0 + 0.015, 0.0578 + 0.095],
+                "camera_rot": [0.0, 23.0, 0.0],
+                "asset_offset_pos": ASSET_OFFSET,
+                "asset_offset_rot": [1.0, 0.0, 0.0, 0.0],
+            },
             noise=None,
         )
         goal_command = ObsTerm(func=mdp.rgb_command, params={"command_name": "rgb_command"}, noise=None)
@@ -238,11 +246,11 @@ class ObservationsCfg:
         def __post_init__(self):
             self.enable_corruption = True
             self.concatenate_terms = True
-            
+
     @configclass
     class CriticCfg(ObsGroup):
         """Observations for Critic group."""
-        
+
         actions = ObsTerm(func=mdp.last_action)
         root_pos_e = ObsTerm(func=mdp.head_pos_w)
         root_quat_w = ObsTerm(func=mdp.root_quat_w)
@@ -252,27 +260,12 @@ class ObservationsCfg:
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=None)
         projected_gravity = ObsTerm(func=mdp.projected_gravity, noise=None)
         joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=None)
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel, noise=None, scale=0.05)      
-        
-        def __post_init__(self):
-            self.enable_corruption = False
-            self.concatenate_terms = True
-
-    @configclass
-    class ImageCfg(ObsGroup):
-        """Observations for Transition group."""
-
-        # observation terms (order preserved)
-        gs_image = ObsTerm(
-            func=mdp.gs_image_feature,
-            params={"camera_pos": [0.332+0.01, 0.0+0.015, 0.0578+0.095], "camera_rot":[0., 23., 0.], "asset_offset_pos": ASSET_OFFSET, "asset_offset_rot":[1.0, 0.0, 0.0, 0.0]},
-            noise=None,
-        )
+        joint_vel = ObsTerm(func=mdp.joint_vel_rel, noise=None, scale=0.05)
 
         def __post_init__(self):
             self.enable_corruption = False
             self.concatenate_terms = True
-            
+
     @configclass
     class LocomotionCfg(ObsGroup):
         """Observations for low-level locomotion."""
@@ -287,7 +280,7 @@ class ObservationsCfg:
         velocity_commands = ObsTerm(func=mdp.zero_velocity_commands)
         joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01))
         joint_vel = ObsTerm(func=mdp.joint_vel_rel, noise=Unoise(n_min=-1.5, n_max=1.5), scale=0.05)
-        actions = ObsTerm(func=mdp.last_action, params={"action_name": "joint_pos"})  # get raw action (joint position)     action is vel command
+        actions = ObsTerm(func=mdp.last_action, params={"action_name": "joint_pos"})  # get raw action (joint position)
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -363,37 +356,56 @@ class EventCfg:
             "velocity_range": (0.0, 0.0),
         },
     )
-    
+
     reset_asset = EventTerm(
         func=mdp.reset_asset,
         mode="reset",
     )
-    
+
     reset_robot_with_cones = EventTerm(
         func=mdp.reset_cones,
         mode="reset",
         params={
-            "pose_range": {"x": [(0.1, 3.0), (0.1, 3.0), (2.15, 3.0)], 
-                        "y": [(0.2, 1.3),  (-3.0, -1.9), (-1.05, -0.2)], 
-                        "z": [(-0.0, -0.0), (-0.0, -0.0), (0.3456, 0.3456)],
-                        "yaw": [(-3.14, 3.14),  (-3.14, 3.14), (-3.14, 3.14)],
+            "pose_range": {
+                "x": [(0.1, 3.0), (0.1, 3.0), (2.15, 3.0)],
+                "y": [(0.2, 1.3), (-3.0, -1.9), (-1.05, -0.2)],
+                "z": [(-0.0, -0.0), (-0.0, -0.0), (0.3456, 0.3456)],
+                "yaw": [(-3.14, 3.14), (-3.14, 3.14), (-3.14, 3.14)],
             },
         },
     )
+
 
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- task
-    reach_goal = RewTerm(func=mdp.reach_goal, weight=0.5, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command", "threshold": 0.35})
-    goal_dis = RewTerm(func=mdp.goal_dis, weight=5.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
-    goal_dis_z = RewTerm(func=mdp.goal_dis_z, weight=30.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
-    goal_heading = RewTerm(func=mdp.goal_heading_l1, weight=0.3, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
-    stand_still_at_goal = RewTerm(func=mdp.stand_still_at_goal, weight=1.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"})
-    track_lin_vel_xy_exp_command = RewTerm(func=mdp.track_lin_vel_xy_exp_command, weight=0.2, params={"std": math.sqrt(0.25)})
-    track_ang_vel_z_exp_command = RewTerm(func=mdp.track_ang_vel_z_exp_command, weight=0.2, params={"std": math.sqrt(0.25)})
+    reach_goal = RewTerm(
+        func=mdp.reach_goal,
+        weight=0.5,
+        params={"base_height": BASE_HEIGHT, "command_name": "rgb_command", "threshold": 0.35},
+    )
+    goal_dis = RewTerm(
+        func=mdp.goal_dis, weight=5.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"}
+    )
+    goal_dis_z = RewTerm(
+        func=mdp.goal_dis_z, weight=30.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"}
+    )
+    goal_heading = RewTerm(
+        func=mdp.goal_heading_l1, weight=0.3, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"}
+    )
+    stand_still_at_goal = RewTerm(
+        func=mdp.stand_still_at_goal, weight=1.0, params={"base_height": BASE_HEIGHT, "command_name": "rgb_command"}
+    )
+    track_lin_vel_xy_exp_command = RewTerm(
+        func=mdp.track_lin_vel_xy_exp_command, weight=0.2, params={"std": math.sqrt(0.25)}
+    )
+    track_ang_vel_z_exp_command = RewTerm(
+        func=mdp.track_ang_vel_z_exp_command, weight=0.2, params={"std": math.sqrt(0.25)}
+    )
     action_l2 = RewTerm(func=mdp.action_l2, weight=-0.002)
+
 
 @configclass
 class TerminationsCfg:
@@ -401,6 +413,7 @@ class TerminationsCfg:
 
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
     bad_orientation = DoneTerm(func=mdp.bad_orientation, params={"limit_angle": 1.0})
+
 
 @configclass
 class CurriculumCfg:
@@ -433,7 +446,7 @@ class UnitreeGo2GSBaseEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self):
         """Post initialization."""
         # general settings
-        self.decimation = 200//UPLEVEL_FREQUENCY
+        self.decimation = 200 // UPLEVEL_FREQUENCY
         self.episode_length_s = 15.0
         # simulation settings
         self.sim.dt = 0.005
@@ -462,18 +475,16 @@ class UnitreeGo2GSEnvCfg(UnitreeGo2GSBaseEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
-        
+
         self.scene.num_envs = 48
         self.scene.robot = UNITREE_GO2_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base"
-        self.scene.terrain.slope_threshold=2
+        self.scene.terrain.slope_threshold = 2
         self.scene.terrain.terrain_generator.horizontal_scale = 0.1
         self.scene.terrain.terrain_generator.num_rows = 5
         self.scene.terrain.terrain_generator.num_cols = 5
         self.scene.terrain.terrain_generator.sub_terrains = {
-            "perlin_terrain": terrain_gen.HfPerlinTerrainCfg(
-                horizontal_scale=0.05, frequency=10, zScale=0.0
-            ),
+            "perlin_terrain": terrain_gen.HfPerlinTerrainCfg(horizontal_scale=0.05, frequency=10, zScale=0.0),
         }
 
         # reduce action scale
@@ -481,10 +492,11 @@ class UnitreeGo2GSEnvCfg(UnitreeGo2GSBaseEnvCfg):
 
         # event
         self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 3.0)
-        
+
         # no curriculum
         self.curriculum.terrain_levels = None
-        
+
+
 @configclass
 class UnitreeGo2GSEnvCfg_PLAY(UnitreeGo2GSEnvCfg):
     def __post_init__(self):

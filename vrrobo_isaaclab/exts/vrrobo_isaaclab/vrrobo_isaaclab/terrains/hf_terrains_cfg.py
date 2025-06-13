@@ -5,10 +5,10 @@
 
 from dataclasses import MISSING
 
-from omni.isaac.lab.utils import configclass
-
 # from ..terrain_generator_cfg import SubTerrainBaseCfg
 from omni.isaac.lab.terrains.terrain_generator_cfg import SubTerrainBaseCfg
+from omni.isaac.lab.utils import configclass
+
 from . import hf_terrains
 
 
@@ -39,6 +39,7 @@ Different height field terrain configurations.
 @configclass
 class HfPerlinTerrainCfg(HfTerrainBaseCfg):
     """Configuration for a random uniform height field terrain."""
+
     function = hf_terrains.perlin_terrain
     frequency = 10
     zScale = 0.1

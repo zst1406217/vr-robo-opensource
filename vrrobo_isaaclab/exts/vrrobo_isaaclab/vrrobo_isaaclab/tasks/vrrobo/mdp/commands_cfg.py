@@ -10,7 +10,7 @@ from omni.isaac.lab.markers import VisualizationMarkersCfg
 from omni.isaac.lab.markers.config import BLUE_ARROW_X_MARKER_CFG, GREEN_ARROW_X_MARKER_CFG
 from omni.isaac.lab.utils import configclass
 
-from .commands import UniformVelocityCommandStanding, RGBCommand
+from .commands import RGBCommand, UniformVelocityCommandStanding
 
 
 @configclass

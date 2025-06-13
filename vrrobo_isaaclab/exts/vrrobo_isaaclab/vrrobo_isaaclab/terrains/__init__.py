@@ -25,7 +25,4 @@ the corresponding x and y coordinates.
 
 """
 
-from .hf_terrains_cfg import (
-    HfTerrainBaseCfg,
-    HfPerlinTerrainCfg,
-)
+from .hf_terrains_cfg import HfPerlinTerrainCfg, HfTerrainBaseCfg

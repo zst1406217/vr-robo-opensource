@@ -11,9 +11,8 @@ import torch
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-import omni.log
-
 import omni.isaac.lab.utils.math as math_utils
+import omni.log
 from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.managers import CommandTerm
 from omni.isaac.lab.markers import VisualizationMarkers
@@ -21,7 +20,7 @@ from omni.isaac.lab.markers import VisualizationMarkers
 if TYPE_CHECKING:
     from omni.isaac.lab.envs import ManagerBasedEnv
 
-    from .commands_cfg import UniformVelocityCommandStandingCfg, RGBCommandCfg
+    from .commands_cfg import RGBCommandCfg, UniformVelocityCommandStandingCfg
 
 
 class UniformVelocityCommandStanding(CommandTerm):
@@ -149,7 +148,7 @@ class UniformVelocityCommandStanding(CommandTerm):
             lin_zero_ids = (self.vel_command_b[:, :2].norm(dim=1) <= 0.1).nonzero(as_tuple=False).flatten()
             env_ids = self.is_heading_env.nonzero(as_tuple=False).flatten()
             env_ids = env_ids[~torch.isin(env_ids, lin_zero_ids)]
-            
+
             # compute angular velocity
             heading_error = math_utils.wrap_to_pi(self.heading_target[env_ids] - self.robot.data.heading_w[env_ids])
             self.vel_command_b[env_ids, 2] = torch.clip(
@@ -163,7 +162,7 @@ class UniformVelocityCommandStanding(CommandTerm):
         self.vel_command_b[standing_env_ids, :] = 0.0
         lin_zero_ids = self.vel_command_b[:, :2].norm(dim=1) <= 0.1
         self.vel_command_b[:, :2] *= (torch.norm(self.vel_command_b[:, :2], dim=1) > 0.1).unsqueeze(1)
-        self.vel_command_b[:, 2] *= (torch.abs(self.vel_command_b[:, 2]) > 0.1)
+        self.vel_command_b[:, 2] *= torch.abs(self.vel_command_b[:, 2]) > 0.1
 
     def _set_debug_vis_impl(self, debug_vis: bool):
         # set visibility of markers
@@ -222,7 +221,6 @@ class UniformVelocityCommandStanding(CommandTerm):
 
 
 class RGBCommand(CommandTerm):
-
     cfg: RGBCommandCfg
     """The configuration of the command generator."""
 
@@ -244,7 +242,7 @@ class RGBCommand(CommandTerm):
         self.rgb_command = torch.zeros(self.num_envs, 3, device=self.device)
         # -- rgb probability [0.5, 0.0, 0.5]
         self.rgb_prob = cfg.RGB_prob
-        
+
     def __str__(self) -> str:
         """Return a string representation of the command generator."""
         msg = "UniformVelocityCommand:\n"

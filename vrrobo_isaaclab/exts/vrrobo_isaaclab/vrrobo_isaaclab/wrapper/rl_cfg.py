@@ -167,14 +167,14 @@ class RslRlPpoActorCriticCNNCfg:
 
     activation: str = MISSING
     """The activation function for the actor and critic networks."""
-    
+
     cnn_type: str = MISSING
     """The type of CNN model to use."""
-    
+
     pretrain: bool = MISSING
-    
+
     image_size: list[int] = MISSING
     """The size of the input image."""
-    
+
     num_cnn_features: int = MISSING
     """The number of features in the CNN model."""

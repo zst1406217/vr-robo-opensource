@@ -16,13 +16,13 @@ The following example shows how to wrap an environment for RSL-RL:
 """
 
 
-import gymnasium as gym
 import torch
 
-from rsl_rl.env import VecEnv
-
+import gymnasium as gym
 from omni.isaac.lab.envs import DirectRLEnv, ManagerBasedRLEnv
 from omni.isaac.lab.managers import SceneEntityCfg
+
+from rsl_rl.env import VecEnv
 
 
 class RslRlGSEnvWrapper(VecEnv):
@@ -88,7 +88,7 @@ class RslRlGSEnvWrapper(VecEnv):
             self.num_privileged_obs = gym.spaces.flatdim(self.unwrapped.single_observation_space["critic"])
         else:
             self.num_privileged_obs = 0
-        
+
         # reset at the start since the RSL-RL runner does not call reset
         self.env.reset()
 
@@ -148,9 +148,9 @@ class RslRlGSEnvWrapper(VecEnv):
         else:
             obs_dict = self.unwrapped._get_observations()
 
-        obs=obs_dict["policy"]
-        obs_dict["critic"]=torch.cat([obs_dict["policy"][:, :28224].clone(), obs_dict["critic"]], dim=1)
-            
+        obs = obs_dict["policy"]
+        obs_dict["critic"] = torch.cat([obs_dict["policy"][:, :28224].clone(), obs_dict["critic"]], dim=1)
+
         return obs, {"observations": obs_dict}
 
     @property
@@ -188,8 +188,8 @@ class RslRlGSEnvWrapper(VecEnv):
         # move extra observations to the extras dict
         obs = obs_dict["policy"]
         extras["observations"] = obs_dict
-        obs_dict["critic"]=torch.cat([obs_dict["policy"].clone(), obs_dict["critic"]], dim=1)
-        
+        obs_dict["critic"] = torch.cat([obs_dict["policy"].clone(), obs_dict["critic"]], dim=1)
+
         # move time out information to the extras dict
         # this is only needed for infinite horizon tasks
         if not self.unwrapped.cfg.is_finite_horizon:
@@ -200,7 +200,7 @@ class RslRlGSEnvWrapper(VecEnv):
 
     def close(self):  # noqa: D102
         return self.env.close()
-    
+
     @property
     def root_states(self):
         asset_cfg = SceneEntityCfg("robot")

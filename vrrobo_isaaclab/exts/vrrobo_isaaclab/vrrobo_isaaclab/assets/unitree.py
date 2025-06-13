@@ -16,12 +16,11 @@ The following configurations are available:
 Reference: https://github.com/unitreerobotics/unitree_ros
 """
 
-from vrrobo_isaaclab.assets import ISAACLAB_ASSETS_DATA_DIR
-
 import omni.isaac.lab.sim as sim_utils
-from omni.isaac.lab.actuators import DelayedPDActuatorCfg, ImplicitActuatorCfg,IdealPDActuatorCfg
+from omni.isaac.lab.actuators import DelayedPDActuatorCfg, IdealPDActuatorCfg, ImplicitActuatorCfg
 from omni.isaac.lab.assets.articulation import ArticulationCfg
 from omni.isaac.lab.utils.assets import ISAACLAB_NUCLEUS_DIR
+from vrrobo_isaaclab.assets import ISAACLAB_ASSETS_DATA_DIR
 
 ##
 # Configuration - Actuators.
