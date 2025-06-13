@@ -2,8 +2,8 @@
 
 The repository contains submodules, thus please check it out with 
 ```shell
-conda create -n vrobo -y python=3.8
-conda activate vrobo
+conda create -n vr-robo-renderer -y python=3.8
+conda activate vr-robo-renderer
 pip install --upgrade pip
 
 pip install torch==2.1.2+cu118 torchvision==0.16.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
@@ -19,19 +19,16 @@ Download our captured demo data from [Google Drive](https://drive.google.com/fil
 pip install gdown
 gdown 1qvmFvhSha5FnKgFldW8WFAEO50HhQ7GZ && unzip vr-robo-dataset.zip
 ```
-The data folder should like this:
+Then copy the pcd folder into `./vrrobo_renderer`. The data folder should like this:
 ```shell
-vr-robo-dataset
-├── pcd
-│   ├── obj1
-│   │   └── point_cloud.ply
-│   ├── obj2
-│   │   └── point_cloud.ply
-│   │── ...
-├── usd
-│   ├── obj1.usd
-│   ├── obj2.usd
-│   │── ...
+vrrobo_renderer
+├── vr-robo-dataset
+│   ├── pcd
+│   │   ├── obj1
+│   │   │   └── point_cloud.ply
+│   │   ├── obj2
+│   │   │   └── point_cloud.ply
+│   │   │── ...
 ```
 
 
