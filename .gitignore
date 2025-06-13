@@ -48,5 +48,3 @@ _build
 */__pycache__/*
 **/output/*
 **/vr-robo-dataset
-
-vrrobo_renderer/submodules/simple-knn/build/
