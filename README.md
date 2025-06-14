@@ -25,7 +25,7 @@ To run the demo, you need to first start the render server in the `vrrobo_render
 conda activate vr-robo-renderer
 python render_server.py
 ```
-Then, in the `vrrobo_isaaclab` directory, you can run the following command to play the demo:
+Then, start a new terminal in the `vrrobo_isaaclab` directory, you can run the following command to play the demo:
 ```shell
 conda activate vr-robo-isaaclab
 python scripts/rsl_rl/play_gs.py --task go2_gs_play
@@ -38,7 +38,7 @@ python scripts/rsl_rl/train_gs.py --task go2_gs --headless
 
 ## 🧷 News
 
-- **[2025-06-13]** We release the training and playing code in simulation.
+- **[2025-06-14]** We release the training and playing code in simulation.
 
 - **[2025-05-11]** Our paper is accepted by RA-L 2025. We will release code in this repo.
 
