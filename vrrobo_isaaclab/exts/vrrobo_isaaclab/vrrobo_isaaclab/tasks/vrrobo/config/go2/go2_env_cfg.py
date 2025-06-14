@@ -36,8 +36,8 @@ BASE_HEIGHT = 0.32
 
 GOAL = [
     (3.2 - 0.53, -0.43, -0.03 + 0.36 + BASE_HEIGHT),  # Red Cone
-    (0, 0, 0),  # Green Cone
-    (3.2 - 1.6, -1.59, -0.03 + 0.03 + BASE_HEIGHT),  # Blue Cone
+    (0, 0, 0),                                        # Green Cone
+    (3.2 - 1.6, -1.59, -0.03 + 0.03 + BASE_HEIGHT),   # Blue Cone
 ]
 
 ASSET_OFFSET = (3.2, 0.0, -0.01)
@@ -92,8 +92,7 @@ class MySceneCfg(InteractiveSceneCfg):
             "object": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Object",
                 spawn=sim_utils.UsdFileCfg(
-                    usd_path="./exts/scene_data/bj4.usd",
-                    # usd_path="./exts/scene_data/SQZ1_13.usd",
+                    usd_path="./exts/scene_data/scene.usd",
                     rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True, disable_gravity=True),
                     mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
                     collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
