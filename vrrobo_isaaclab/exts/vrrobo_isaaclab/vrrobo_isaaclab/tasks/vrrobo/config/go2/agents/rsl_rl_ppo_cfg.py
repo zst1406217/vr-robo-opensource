@@ -11,7 +11,7 @@ from vrrobo_isaaclab.wrapper.rl_cfg import RslRlOnPolicyRunnerCfg, RslRlPpoActor
 class UnitreeGo2GSPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     device = "cuda:0"
     num_steps_per_env = 40
-    max_iterations = 8000
+    max_iterations = 4000
     save_interval = 100
     experiment_name = "unitree_go2_gs"
     empirical_normalization = False
